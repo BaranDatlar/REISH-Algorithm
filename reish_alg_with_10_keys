@@ -1,0 +1,101 @@
+"""
+In order to understand the accuracy of the algorithm,
+I shared the code that takes 10 keys from the user and logs out when requested and shows the result.
+"""
+
+import random
+from tabulate import tabulate
+
+keys = [None] * 10
+links = [None] * 10
+
+
+def swap(a, ind1, ind2):
+    tmp = a[ind1]
+    a[ind1] = a[ind2]
+    a[ind2] = tmp
+
+
+def getIndex(keys):
+    keyIndexs = []
+    for i in range(10):
+        if keys[i] is not None:
+            keyIndexs.append(keys.index(keys[i]))
+    return keyIndexs
+
+
+def getNoneIndex(keys):
+    nonekeyIndexs = []
+    for i in range(10):
+        if keys[i] is None:
+            nonekeyIndexs.append(i)
+    return nonekeyIndexs
+
+
+def deleteNone(arr, loc):
+    arr.pop(loc)
+
+
+def insertLink(ri, mod):
+    if links[mod] is None:
+        deleteNone(links, ri)
+        links.insert(mod, ri)
+
+    elif links[mod] is not None:
+        deleteNone(links, ri)
+        links.insert(ri, ri)
+        swap(links, ri, mod)
+
+
+def insertNum(inp, mod):
+    if keys[mod] is None:
+        deleteNone(keys, mod)
+        keys.insert(mod, inp)
+    elif keys[mod] is not None:
+        ri = random.choice(getNoneIndex(keys))
+        deleteNone(keys, ri)
+        keys.insert(ri, inp)
+        insertLink(ri, mod)
+
+
+def recursiveSearch(keys, a, val, sayac):
+    if keys[a] == val:
+        print("searching value has " + str(sayac) + " probes")
+
+    else:
+        sayac += 1
+        a = links[a]
+        recursiveSearch(keys, a, val, sayac)
+
+
+def searchValue(keys, links, val, hash):
+    mod = val % hash
+    if keys[mod] == val:
+        return 1
+    else:
+        sayac = 2
+        recursiveSearch(keys, links[mod], val, sayac)
+
+
+print("please insert a prime number for selecting hash key")
+flag = True
+hash = int(input())
+while flag:
+    print("please insert that you want to add keys, press -1 to exit and show table")
+    inp = int(input())
+    if inp >= 0:
+
+        mod = inp % hash
+        insertNum(inp, mod)
+        print("key table : " + str(keys))
+        print("link table : " + str(links))
+
+    else:
+        flag = False
+
+data = list(zip(keys, links))
+col_names = ("keys", "links")
+print(tabulate(data, headers=col_names, tablefmt="fancy_grid", showindex="always"))
+print("insert key that if you want to search")
+a = int(input())
+searchValue(keys, links, a, hash)
